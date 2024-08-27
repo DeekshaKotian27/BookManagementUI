@@ -22,6 +22,9 @@ Forms include basic validation and error handling, ensuring that users provide c
 - Integration with Backend: 
 The frontend interacts with a backend API ( built using .NET:[Book Management API](https://github.com/DeekshaKotian27/BookManagementAPI)) to fetch and manipulate data related to books, authors, etc.
 
+- Authentication: 
+Uses API Key Authentication passing in the header to authenticate the API endpoints.
+
 
 ## Getting Started with Create React App
 In the project directory, you can run:
