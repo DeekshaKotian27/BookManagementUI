@@ -22,6 +22,7 @@ const Header: React.FC<HeaderProps> = ({ displayNav, setDisplayNav }) => {
   const handleLogout = () => {
     setLoginData({ emailID: "", password: "", userName: "" });
     localStorage.removeItem("loginData");
+    localStorage.removeItem("JWTToken");
   };
   return (
     <div>

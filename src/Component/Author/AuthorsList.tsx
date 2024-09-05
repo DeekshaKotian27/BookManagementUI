@@ -18,36 +18,47 @@ import AuthorDetail from "./AuthorDetail";
 import "../../CSS/StylePages.css";
 import AddButton from "../AddButton";
 import SearchTextField from "../SearchTextField";
+import YesNoDialougeBox from "../YesNoDialougeBox";
+import MessageDialougeBox from "../MessageDialougeBox";
 
 const AuthorsList: React.FC = () => {
   const [authors, setAuthors] = useState<Author[]>([]);
   const [showAddAuthor, setShowAddAuthor] = useState<boolean>(false);
-  const [editAuthor, setEditAuthor] = useState<Author | null>(null);
-  const [AuthorId, setAuthorId] = useState<number | null>(null);
+  const [editAuthorData, setEditAuthorData] = useState<Author | null>(null);
+  const [AuthorId, setAuthorId] = useState<number>(-1);
+  const [showAuthorDetail, setShowAuthorDetail] = useState<boolean>(false);
+  const [deletePopup, setDeletePopup] = useState<boolean>(false);
+  const [apiMessagePopUp,setApiMessagePopup]=useState<boolean>(false);
+  const [apiMessage,setApiMessage]=useState<String>("");
+  const [success, setSuccess] = useState<boolean>(false);
+
   const handleAddAuthorPopupClose = () => setShowAddAuthor(false);
-  const handleAuthorDetailPopup = () => setAuthorId(null);
+  const handleAuthorDetailPopup = () => setShowAuthorDetail(false);
+  const handleDeletePopup=()=>setDeletePopup(false);
+  const handleAPIMessagePopup=()=>setApiMessagePopup(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const result = await getAuthors();
-        setAuthors(result);
-      } catch (error) {
-        console.error("Error fetching authors:", error);
-      }
+        const authorListResponse = await getAuthors();
+        if(authorListResponse!==null && authorListResponse.success){
+          setAuthors(authorListResponse.data as Author[]);
+        }
     };
 
     fetchData();
-  }, []);
+  }, [authors]);
 
   const handleDelete = async (id: number) => {
-    await deleteAuthor(id);
-    window.location.reload();
+    var deleteData=await deleteAuthor(id);
+    setSuccess(deleteData.success);
+    setApiMessage(deleteData.message);
+    setDeletePopup(false);
+    setApiMessagePopup(true)
   };
 
   const handleEdit = (author: Author) => {
     setShowAddAuthor(true);
-    setEditAuthor(author);
+    setEditAuthorData(author);
   };
 
   return (
@@ -67,14 +78,27 @@ const AuthorsList: React.FC = () => {
         <div className="popUp">
           <AddAuthor
             setShowAddAuthor={setShowAddAuthor}
-            editAuthor={editAuthor}
-            setEditAuthor={setEditAuthor}
+            editAuthor={editAuthorData}
+            setEditAuthor={setEditAuthorData}
           />
         </div>
       </Modal>
-      <Modal open={AuthorId ? true : false} onClose={handleAuthorDetailPopup}>
+      <Modal open={showAuthorDetail} onClose={handleAuthorDetailPopup}>
         <div className="popUp">
-          <AuthorDetail AuthorId={AuthorId} setAuthorId={setAuthorId} />
+          <AuthorDetail AuthorId={AuthorId} setShowAuthorDetail={setShowAuthorDetail}/>
+        </div>
+      </Modal>
+      {/* Confirm Delete pop up */}
+      <Modal open={deletePopup} onClose={handleDeletePopup}>
+        <div className="MessageBoxPopUp">
+          <YesNoDialougeBox Id={AuthorId} handleDelete={handleDelete}
+           setDeletePopup={setDeletePopup}/>
+        </div>
+      </Modal>
+      {/*Api Message popUp */}
+      <Modal open={apiMessagePopUp} onClose={handleAPIMessagePopup}>
+        <div  className="MessageBoxPopUp">
+          <MessageDialougeBox apiMessage={apiMessage} setApiMessagePopup={setApiMessagePopup} success={success}/>
         </div>
       </Modal>
 
@@ -101,7 +125,7 @@ const AuthorsList: React.FC = () => {
                   <Button
                     variant="outlined"
                     color="primary"
-                    onClick={() => setAuthorId(author.authorId)}
+                    onClick={() => {setShowAuthorDetail(true);setAuthorId(author.authorId)}}
                     sx={{ mr: 1 }}
                   >
                     View
@@ -117,7 +141,7 @@ const AuthorsList: React.FC = () => {
                   <Button
                     variant="outlined"
                     color="error"
-                    onClick={() => handleDelete(author.authorId)}
+                    onClick={() =>{ setDeletePopup(true);setAuthorId(author.authorId)}}
                   >
                     Delete
                   </Button>

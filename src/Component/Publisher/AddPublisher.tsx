@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Container, TextField } from "@mui/material";
+import { Box, Button, Container, Modal, TextField } from "@mui/material";
 import { NewPublisher, Publisher } from "../../Interface/Publisher";
 import { addPublisher, updatePublisher } from "../../Services/PublisherService";
 import "../../CSS/StylePages.css";
 import ModalHeader from "../ModalHeader";
+import MessageDialougeBox from "../MessageDialougeBox";
 
 interface AddPublisherProps {
   setShowAddPublisher: (show: boolean) => void;
@@ -22,6 +23,15 @@ const AddPublisher: React.FC<AddPublisherProps> = ({
     publisherEmailId: "",
     publisherPhoneNumber: "",
   });
+  const [apiMessagePopUp, setApiMessagePopup11] = useState<boolean>(false);
+  const [apiMessage, setApiMessage] = useState<String>("");
+  const [success, setSuccess] = useState<boolean>(false);
+
+  const handleAPIMessagePopup = () => {
+    console.log("API message popup closed"); // Debugging output
+    setApiMessagePopup11(false);
+    setShowAddPublisher(false);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -43,11 +53,16 @@ const AddPublisher: React.FC<AddPublisherProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
+    let response;
       if (editPublisher) {
-        await updatePublisher(editPublisher.publisherID, addPublisherData);
+        response=await updatePublisher(editPublisher.publisherID, addPublisherData);
       } else {
-        await addPublisher(addPublisherData);
+        response=await addPublisher(addPublisherData);
+      }
+      if(response){
+        setSuccess(response.success);
+        setApiMessage(response.message);
+        setApiMessagePopup11(true);
       }
       setAddPublisherData({
         publisherName: "",
@@ -55,11 +70,6 @@ const AddPublisher: React.FC<AddPublisherProps> = ({
         publisherEmailId: "",
         publisherPhoneNumber: "",
       });
-      setShowAddPublisher(false);
-      window.location.reload();
-    } catch (e) {
-      console.error(e);
-    }
   };
   const handleCancel = () => {
     setShowAddPublisher(false);
@@ -71,6 +81,16 @@ const AddPublisher: React.FC<AddPublisherProps> = ({
         handleClose={handleCancel}
         heading={editPublisher ? "Edit Publisher" : "Add Publisher"}
       />
+      <Modal open={apiMessagePopUp} onClose={handleAPIMessagePopup}>
+        <div className="MessageBoxPopUp">
+          <MessageDialougeBox
+            apiMessage={apiMessage}
+            setApiMessagePopup={setApiMessagePopup11}
+            success={success}
+            setShowPopup={setShowAddPublisher}
+          />
+        </div>
+      </Modal>
       <div className="add-form">
         <form onSubmit={handleSubmit}>
           <Container maxWidth="sm">

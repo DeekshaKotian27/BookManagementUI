@@ -1,9 +1,10 @@
-import { Box, Button, Container, TextField } from "@mui/material";
+import { Box, Button, Container, Modal, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Author, newAuthor } from "../../Interface/Author";
 import { addAuthors, updateAuthor } from "../../Services/AuthorService";
 import "../../CSS/StylePages.css";
 import ModalHeader from "../ModalHeader";
+import MessageDialougeBox from "../MessageDialougeBox";
 
 interface AddAuthorProps {
   setShowAddAuthor: (show: boolean) => void;
@@ -20,6 +21,15 @@ const AddAuthor: React.FC<AddAuthorProps> = ({
     firstName: "",
     lastName: "",
   });
+  const [apiMessagePopUp, setApiMessagePopup11] = useState<boolean>(false);
+  const [apiMessage, setApiMessage] = useState<String>("");
+  const [success, setSuccess] = useState<boolean>(false);
+
+  const handleAPIMessagePopup = () => {
+    console.log("API message popup closed"); // Debugging output
+    setApiMessagePopup11(false);
+    setShowAddAuthor(false);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,38 +49,41 @@ const AddAuthor: React.FC<AddAuthorProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
+    let response;
       if (editAuthor) {
-        await updateAuthor(editAuthor.authorId, addAuthor);
-        setAddAuthor({ firstName: "", lastName: "" });
-        setShowAddAuthor(false);
-        window.location.reload();
+        response=await updateAuthor(editAuthor.authorId, addAuthor);
       } else {
-        await addAuthors(addAuthor);
-        setAddAuthor({ firstName: "", lastName: "" });
-        setShowAddAuthor(false);
-        window.location.reload();
+        response=await addAuthors(addAuthor);
       }
-    } catch (e) {
-      console.error("error adding author");
-    }
+      if(response){
+        setSuccess(response.success);
+        setApiMessage(response.message);
+        setApiMessagePopup11(true);
+      }
+       setAddAuthor({ firstName: "", lastName: "" });
   };
 
-  const handleDelete = () => {
+  const handleCancel = () => {
     setShowAddAuthor(false);
     setEditAuthor(null);
-  };
-
-  const handleClose = () => {
-    setShowAddAuthor(false);
   };
 
   return (
     <div>
       <ModalHeader
-        handleClose={handleClose}
+        handleClose={handleCancel}
         heading={editAuthor ? "Edit Author" : "Add Author"}
       />
+      <Modal open={apiMessagePopUp} onClose={handleAPIMessagePopup}>
+        <div className="MessageBoxPopUp">
+          <MessageDialougeBox
+            apiMessage={apiMessage}
+            setApiMessagePopup={setApiMessagePopup11}
+            success={success}
+            setShowPopup={setShowAddAuthor}
+          />
+        </div>
+      </Modal>
       <div className="add-form">
         <form onSubmit={handleSubmit}>
           <Container maxWidth="sm">
@@ -107,7 +120,7 @@ const AddAuthor: React.FC<AddAuthorProps> = ({
                 {editAuthor ? "Update" : "Add"}
               </Button>
               <Button
-                onClick={handleDelete}
+                onClick={handleCancel}
                 variant="outlined"
                 style={{ backgroundColor: "red", color: "white" }}
               >

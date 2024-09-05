@@ -17,32 +17,45 @@ import AddBook from "./AddBook";
 import "../../App.css";
 import AddButton from "../AddButton";
 import SearchTextField from "../SearchTextField";
+import YesNoDialougeBox from "../YesNoDialougeBox";
+import MessageDialougeBox from "../MessageDialougeBox";
 
 const BooksList: React.FC = () => {
   const [books, setBooks] = useState<Books[]>([]);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [editBook, setEditBook] = useState<Books | null>(null);
+  const [deletePopup, setDeletePopup] = useState<boolean>(false);
+  const [apiMessagePopUp,setApiMessagePopup]=useState<boolean>(false);
+  const [apiMessage,setApiMessage]=useState<String>("");
+  const [id,setId]=useState<number>(-1);
+  const [success, setSuccess] = useState<boolean>(false);
+
   const handlePopupClose = () => {
     setShowPopup(false);
     setEditBook(null);
   };
+  const handleDeletePopup = () => {
+    setDeletePopup(false);
+  };
+  const handleAPIMessagePopup=()=>{setApiMessagePopup(false)}
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const result = await getBooks();
-        setBooks(result);
-      } catch (error) {
-        console.error("Error fetching books:", error);
+      const bookListResponse = await getBooks();
+      if (bookListResponse != null && bookListResponse.success) {
+        setBooks(bookListResponse.data as Books[]);
       }
     };
 
     fetchData();
-  }, []);
+  }, [books]);
 
   const handleDelete = async (id: number) => {
-    await deleteBook(id);
-    window.location.reload();
+    var deleteData=await deleteBook(id);
+    setSuccess(deleteData.success);
+    setApiMessage(deleteData.message);
+    setDeletePopup(false);
+    setApiMessagePopup(true)
   };
   const handleEdit = (book: Books) => {
     setShowPopup(true);
@@ -68,6 +81,7 @@ const BooksList: React.FC = () => {
 
         <AddButton handleOnClick={() => setShowPopup(true)} text="Add Book" />
       </div>
+      {/* ADD/Edit pop up */}
       <Modal open={showPopup} onClose={handlePopupClose}>
         <div className="popUp">
           <AddBook
@@ -75,6 +89,19 @@ const BooksList: React.FC = () => {
             editBook={editBook}
             setEditBook={setEditBook}
           />
+        </div>
+      </Modal>
+      {/* Confirm Delete pop up */}
+      <Modal open={deletePopup} onClose={handleDeletePopup}>
+        <div className="MessageBoxPopUp">
+          <YesNoDialougeBox Id={id} handleDelete={handleDelete}
+           setDeletePopup={setDeletePopup}/>
+        </div>
+      </Modal>
+      {/*Api Message popUp */}
+      <Modal open={apiMessagePopUp} onClose={handleAPIMessagePopup}>
+        <div  className="MessageBoxPopUp">
+          <MessageDialougeBox apiMessage={apiMessage} setApiMessagePopup={setApiMessagePopup} success={success}/>
         </div>
       </Modal>
       <TableContainer
@@ -110,7 +137,7 @@ const BooksList: React.FC = () => {
                     Edit
                   </Button>
                   <Button
-                    onClick={() => handleDelete(bookData.bookID)}
+                    onClick={() =>{ setDeletePopup(true);setId(bookData.bookID)}}
                     variant="outlined"
                     color="error"
                     sx={{ mr: 1 }}

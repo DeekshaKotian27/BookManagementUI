@@ -8,6 +8,7 @@ import {
   Button,
   Container,
   Box,
+  Modal,
 } from "@mui/material";
 import { Books, NewBook } from "../../Interface/Book";
 import { addBooks, updateBook } from "../../Services/BookService";
@@ -18,6 +19,8 @@ import { Author } from "../../Interface/Author";
 import { Publisher } from "../../Interface/Publisher";
 import { Category } from "../../Interface/Category";
 import ModalHeader from "../ModalHeader";
+import MessageDialougeBox from "../MessageDialougeBox";
+import "../../App.css";
 
 interface AddBookProps {
   setShowPopup: (show: boolean) => void;
@@ -37,17 +40,31 @@ const AddBook: React.FC<AddBookProps> = ({
   const [category, setCategory] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [title, setTitle] = useState<string>("");
+  const [apiMessagePopUp, setApiMessagePopup11] = useState<boolean>(false);
+  const [apiMessage, setApiMessage] = useState<String>("");
+  const [success, setSuccess] = useState<boolean>(false);
+
+  const handleAPIMessagePopup = () => {
+    console.log("API message popup closed"); // Debugging output
+    setApiMessagePopup11(false);
+    setShowPopup(false);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
-      const authorsData = await getAuthors();
-      setAuthors(authorsData);
+      const authorListResponse = await getAuthors();
+      if (authorListResponse !== null && authorListResponse.success) {
+        setAuthors(authorListResponse.data as Author[]);
+      }
 
-      const publisher = await getPublishers();
-      setPublishers(publisher);
+      const publisherResponse = await getPublishers();
+      if(publisherResponse!=null && publisherResponse.success)
+      {setPublishers(publisherResponse.data as Publisher[]);}
 
-      const category = await getCategories();
-      setCategory(category);
+      const categoriesListResponse = await getCategories();
+      if (categoriesListResponse !== null && categoriesListResponse.success) {
+        setCategory(categoriesListResponse.data as Category[]);
+      }
     };
     fetchData();
   }, []);
@@ -69,21 +86,21 @@ const AddBook: React.FC<AddBookProps> = ({
       publisherId: parseInt(selectedPublisher),
       categoryId: parseInt(selectedCategory),
     };
-    try {
-      if (editBook) {
-        await updateBook(editBook.bookID, newBook);
-      } else {
-        await addBooks(newBook);
-      }
-      setSelectedAuthor("");
-      setSelectedCategory("");
-      setSelectedPublisher("");
-      setTitle("");
-      setShowPopup(false);
-      window.location.reload();
-    } catch (error) {
-      console.error("Error adding book:", error);
+    let response;
+    if (editBook) {
+      response = await updateBook(editBook.bookID, newBook);
+    } else {
+      response = await addBooks(newBook);
     }
+    if(response){
+      setSuccess(response.success);
+      setApiMessage(response.message);
+      setApiMessagePopup11(true);
+    }
+    setSelectedAuthor("");
+    setSelectedCategory("");
+    setSelectedPublisher("");
+    setTitle("");
   };
 
   const handleCancel = () => {
@@ -97,6 +114,16 @@ const AddBook: React.FC<AddBookProps> = ({
         handleClose={handleCancel}
         heading={editBook ? "Edit Book" : "Add Book"}
       />
+      <Modal open={apiMessagePopUp} onClose={handleAPIMessagePopup}>
+        <div className="MessageBoxPopUp">
+          <MessageDialougeBox
+            apiMessage={apiMessage}
+            setApiMessagePopup={setApiMessagePopup11}
+            success={success}
+            setShowPopup={setShowPopup}
+          />
+        </div>
+      </Modal>
       <div className="add-form">
         <form onSubmit={handleSubmit}>
           <Container>

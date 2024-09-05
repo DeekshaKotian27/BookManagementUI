@@ -33,14 +33,23 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const bookList = await getBooks();
-        setBooks(bookList);
-        const authorList = await getAuthors();
-        setAuthors(authorList);
-        const publisherList = await getPublishers();
-        setPublishers(publisherList);
-        const result = await getCategories();
-        setCategory(result);
+        const bookListResponse = await getBooks();
+        if (bookListResponse != null && bookListResponse.success) {
+          setBooks(bookListResponse.data as Books[]);
+        }
+        const authorListResponse = await getAuthors();
+        if (authorListResponse !== null && authorListResponse.success) {
+          setAuthors(authorListResponse.data as Author[]);
+        }
+        const publisherResponse = await getPublishers();
+        if (publisherResponse != null && publisherResponse.success) {
+          setPublishers(publisherResponse.data as Publisher[]);
+        }
+
+        const categoriesListResponse = await getCategories();
+        if (categoriesListResponse !== null && categoriesListResponse.success) {
+          setCategory(categoriesListResponse.data as Category[]);
+        }
       } catch (error) {
         console.error("Error fetching books:", error);
       }

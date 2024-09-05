@@ -5,34 +5,31 @@ import { Typography } from "@mui/material";
 import ModalHeader from "../ModalHeader";
 
 interface CategoryDetailProps {
-  categoryId: number | null;
-  setCategoryID: (id: number | null) => void;
+  categoryId: number;
+  setShowCategoryDetail: (show: boolean) => void;
 }
 
 const CategoryDetail: React.FC<CategoryDetailProps> = ({
   categoryId,
-  setCategoryID,
+  setShowCategoryDetail,
 }) => {
   const [categoryDetail, setCategoryDetail] = useState<Category>();
 
   useEffect(() => {
     const fetchData = async () => {
       if (categoryId) {
-        var data = await getCategoryByID(parseInt("1"));
-        setCategoryDetail(data);
-      } else {
-        console.log("ivalid id");
-      }
+        var data = await getCategoryByID(parseInt(categoryId.toString()));
+        if(data!==null && data.success)
+        {setCategoryDetail(data.data as Category);}
+      } 
     };
     fetchData();
   }, []);
-  const handleClose = () => {
-    setCategoryID(null);
-  };
+  
   console.log(categoryDetail);
   return (
     <div>
-      <ModalHeader handleClose={handleClose} heading="Details" />
+      <ModalHeader handleClose={()=>setShowCategoryDetail(false)} heading="Details" />
       <div className="add-form">
         <h1>{categoryDetail?.categoryName}</h1>
         {categoryDetail?.books.length === 0 ? (
