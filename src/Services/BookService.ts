@@ -1,63 +1,82 @@
-import axios from "axios";
-import {Books,NewBook} from '../Interface/Book';
+import axios, { AxiosError } from "axios";
+import { Books, NewBook } from "../Interface/Book";
+import { ValidationResponse } from "../Interface/ValidationResponse";
+import { handleAxiosError } from "./ErrorResponse";
 
 const API_URL = process.env.REACT_APP_API_URL;
 const API_KEY = process.env.REACT_APP_API_KEY;
-const API_KEY_VALUE=process.env.REACT_APP_API_KEY_VALUE;
+const API_KEY_VALUE = process.env.REACT_APP_API_KEY_VALUE;
+const token = localStorage.getItem("JWTToken");
+console.log(token)
+export const getBooks = async (): Promise<ValidationResponse> => {
+  try {
+    const response = await axios.get<Books[]>(`${API_URL}/Books`, {
+      headers: {
+        [API_KEY!]: API_KEY_VALUE!,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return {
+      success: true,
+      message: "Successfull",
+      data: response.data,
+    };
+  } catch (error) {
+    console.error("Error fetching books:", error);
+    return handleAxiosError(error as AxiosError);
+  }
+};
 
-export const getBooks= async():Promise<Books[]>=>{
-    try{
-        const response= await axios.get<Books[]>(`${API_URL}/Books`,{
-            headers: {
-                [API_KEY!]: API_KEY_VALUE!,
-            }
-          });
-        return response.data;
-    }
-    catch (error) {
-        console.error('Error fetching books:', error);
-        throw error;
-      }
-}
+export const addBooks = async (book: NewBook): Promise<ValidationResponse> => {
+  try {
+    await axios.post<NewBook>(`${API_URL}/Books`, book, {
+      headers: {
+        [API_KEY!]: API_KEY_VALUE!,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return {
+      success: true,
+      message: "Author added successfully",
+    };
+  } catch (error) {
+    console.error("Error creating books:", error);
+    return handleAxiosError(error as AxiosError);
+  }
+};
 
-export const addBooks= async(book:NewBook):Promise<NewBook>=>{
-    try{
-        const response =await axios.post<NewBook>(`${API_URL}/Books`,book,{
-            headers: {
-                [API_KEY!]: API_KEY_VALUE!,
-            }
-          });
-        return response.data;
-    }
-    catch (error) {
-        console.error('Error creating books:', error);
-        throw error;
-      }
-}
+export const updateBook = async (
+  bookId: number,
+  updatedBook: NewBook
+): Promise<ValidationResponse> => {
+  try {
+    await axios.put(`${API_URL}/Books/${bookId}`, updatedBook, {
+      headers: {
+        [API_KEY!]: API_KEY_VALUE!,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return { success: true, message: "Successfully Updated" };
+  } catch (error) {
+    console.error("Error updating book:", error);
+    return handleAxiosError(error as AxiosError);
+  }
+};
 
-export const updateBook = async (bookId: number, updatedBook: NewBook): Promise<void> => {
-    try {
-        const response = await axios.put(`${API_URL}/Books/${bookId}`, updatedBook,{
-            headers: {
-                [API_KEY!]: API_KEY_VALUE!,
-            }
-          });
-        return response.data;
-    } catch (error) {
-        console.error('Error updating book:', error);
-        throw error;
+export const deleteBook = async (bookId: number): Promise<ValidationResponse> => {
+  try {
+    await axios.delete(`${API_URL}/Books/${bookId}`, {
+      headers: {
+        [API_KEY!]: API_KEY_VALUE!,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return {
+        success:true,
+        message:"Deleted successfully"
     }
-}
-
-export const deleteBook = async (bookId: number): Promise<void> => {
-    try {
-        await axios.delete(`${API_URL}/Books/${bookId}`,{
-            headers: {
-                [API_KEY!]: API_KEY_VALUE!,
-            }
-          });
-    } catch (error) {
-        console.error('Error deleting book:', error);
-        throw error;
-    }
-}
+  } catch (error) {
+    console.error("Error deleting book:", error);
+    return handleAxiosError(error as AxiosError);
+  }
+};

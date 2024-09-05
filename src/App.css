@@ -11,7 +11,6 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 10px;
-
 }
 
 .secondary-nav {
@@ -67,4 +66,11 @@ body {
   width: 50%;
   height: auto;
   max-height: 300px;
+}
+
+.MessageBoxPopUp {
+  width: 350px;
+  position: absolute;
+  top: 30%;
+  left: 40%;
 }

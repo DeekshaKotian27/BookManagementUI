@@ -1,9 +1,10 @@
-import { Box, Button, Container, TextField } from "@mui/material";
+import { Box, Button, Container, Modal, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Category, NewCategory } from "../../Interface/Category";
 import { addCategory, updateCategory } from "../../Services/CategoryService";
 import "../../CSS/StylePages.css";
 import ModalHeader from "../ModalHeader";
+import MessageDialougeBox from "../MessageDialougeBox";
 
 interface AddCategoryProps {
   setShowAddCategory: (show: boolean) => void;
@@ -19,6 +20,15 @@ const AddCategory: React.FC<AddCategoryProps> = ({
   const [AddCategory, setAddCategory] = useState<NewCategory>({
     categoryName: "",
   });
+  const [apiMessagePopUp, setApiMessagePopup11] = useState<boolean>(false);
+  const [apiMessage, setApiMessage] = useState<String>("");
+  const [success, setSuccess] = useState<boolean>(false);
+
+  const handleAPIMessagePopup = () => {
+    console.log("API message popup closed"); // Debugging output
+    setApiMessagePopup11(false);
+    setShowAddCategory(false);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,21 +45,18 @@ const AddCategory: React.FC<AddCategoryProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      if (editCategory) {
-        await updateCategory(editCategory.categoryID, AddCategory);
-        setAddCategory({ categoryName: "" });
-        setShowAddCategory(false);
-        window.location.reload();
-      } else {
-        await addCategory(AddCategory);
-        setAddCategory({ categoryName: "" });
-        setShowAddCategory(false);
-        window.location.reload();
-      }
-    } catch (e) {
-      console.log(e);
+    let response;
+    if (editCategory) {
+      response = await updateCategory(editCategory.categoryID, AddCategory);
+    } else {
+      response = await addCategory(AddCategory);
     }
+    if (response) {
+      setSuccess(response.success);
+      setApiMessage(response.message);
+      setApiMessagePopup11(true);
+    }
+    setAddCategory({ categoryName: "" });
   };
   const handleCancel = () => {
     setShowAddCategory(false);
@@ -62,6 +69,16 @@ const AddCategory: React.FC<AddCategoryProps> = ({
         handleClose={handleCancel}
         heading={editCategory ? "Edit Category" : "Add Category"}
       />
+      <Modal open={apiMessagePopUp} onClose={handleAPIMessagePopup}>
+        <div className="MessageBoxPopUp">
+          <MessageDialougeBox
+            apiMessage={apiMessage}
+            setApiMessagePopup={setApiMessagePopup11}
+            success={success}
+            setShowPopup={setShowAddCategory}
+          />
+        </div>
+      </Modal>
       <div className="add-form">
         <form onSubmit={handleSubmit}>
           <Container maxWidth="sm">

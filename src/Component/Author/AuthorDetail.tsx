@@ -6,32 +6,30 @@ import "../../CSS/StylePages.css";
 import ModalHeader from "../ModalHeader";
 
 interface AuthorDetailProps {
-  AuthorId: number | null;
-  setAuthorId: (id: number | null) => void;
+  AuthorId: number;
+  setShowAuthorDetail: (show:boolean) => void;
 }
 
 const AuthorDetail: React.FC<AuthorDetailProps> = ({
   AuthorId,
-  setAuthorId,
+  setShowAuthorDetail,
 }) => {
   const [authorDetail, setAuthorDetail] = useState<Author>();
   useEffect(() => {
     const fetchData = async () => {
-      if (AuthorId) {
         var data = await getAuthorByID(AuthorId);
-        setAuthorDetail(data);
+        if(data!=null && data.success){
+          setAuthorDetail(data.data as Author);
       }
     };
     fetchData();
   }, []);
 
-  const handleClose = () => {
-    setAuthorId(null);
-  };
+  
   console.log("Author Detail", authorDetail);
   return (
     <div>
-      <ModalHeader handleClose={handleClose} heading="Details" />
+      <ModalHeader handleClose={()=>setShowAuthorDetail(false)} heading="Details" />
       <div className="add-form">
         <h1>
           {authorDetail?.firstName} {authorDetail?.lastName}

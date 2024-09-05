@@ -21,31 +21,43 @@ import "../../CSS/StylePages.css";
 import PublisherDetail from "./PublisherDetail";
 import AddButton from "../AddButton";
 import SearchTextField from "../SearchTextField";
+import YesNoDialougeBox from "../YesNoDialougeBox";
+import MessageDialougeBox from "../MessageDialougeBox";
 
 const PublishersList = () => {
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [showAddPublisher, setShowAddPublisher] = useState<boolean>(false);
   const [editPublisher, setEditPublisher] = useState<Publisher | null>(null);
-  const [publisherId, setPublisherId] = useState<number | null>(null);
+  const [publisherId, setPublisherId] = useState<number>(-1);
+  const [showPublisherDetail,setshowPublisherDetail]=useState<boolean>(false);
+  const [deletePopup, setDeletePopup] = useState<boolean>(false);
+  const [apiMessagePopUp,setApiMessagePopup]=useState<boolean>(false);
+  const [apiMessage,setApiMessage]=useState<String>("");
+  const [success, setSuccess] = useState<boolean>(false);
+
   const handleClosePopUp = () => setShowAddPublisher(false);
-  const handleCloseDetailPopUp = () => setPublisherId(null);
+  const handleCloseDetailPopUp = () => setshowPublisherDetail(false);
+  const handleDeletePopup=()=>setDeletePopup(false);
+  const handleAPIMessagePopup=()=>setApiMessagePopup(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
         const result = await getPublishers();
-        setPublishers(result);
-      } catch (error) {
-        console.error("Error fetching authors:", error);
-      }
+        if (result != null && result.success) {
+          setPublishers(result.data as Publisher[]);
+        }
+      
     };
 
     fetchData();
-  }, []);
+  }, [publishers]);
 
   const handleDelete = async (id: number) => {
-    await deletePublisher(id);
-    window.location.reload();
+    var deleteData=await deletePublisher(id);
+    setSuccess(deleteData.success);
+    setApiMessage(deleteData.message);
+    setDeletePopup(false);
+    setApiMessagePopup(true)
   };
 
   const handleEdit = (publisher: Publisher) => {
@@ -75,14 +87,29 @@ const PublishersList = () => {
           />
         </div>
       </Modal>
-      <Modal open={publisherId ? true : false} onClose={handleCloseDetailPopUp}>
+      <Modal open={showPublisherDetail} onClose={handleCloseDetailPopUp}>
         <div className="popUp">
           <PublisherDetail
             publisherId={publisherId}
-            setPublisherId={setPublisherId}
+            setshowPublisherDetail={setshowPublisherDetail}
           />
         </div>
       </Modal>
+
+{/* Confirm Delete pop up */}
+<Modal open={deletePopup} onClose={handleDeletePopup}>
+        <div className="MessageBoxPopUp">
+          <YesNoDialougeBox Id={publisherId} handleDelete={handleDelete}
+           setDeletePopup={setDeletePopup}/>
+        </div>
+      </Modal>
+      {/*Api Message popUp */}
+      <Modal open={apiMessagePopUp} onClose={handleAPIMessagePopup}>
+        <div  className="MessageBoxPopUp">
+          <MessageDialougeBox apiMessage={apiMessage} setApiMessagePopup={setApiMessagePopup} success={success}/>
+        </div>
+      </Modal>
+
       <TableContainer
         component={Paper}
         sx={{ maxHeight: 440, textAlignLast: "center" }}
@@ -108,7 +135,7 @@ const PublishersList = () => {
                 <TableCell>{publisher.publisherAddress}</TableCell>
                 <TableCell>
                   <Button
-                    onClick={() => setPublisherId(publisher.publisherID)}
+                    onClick={() => {setshowPublisherDetail(true);setPublisherId(publisher.publisherID)}}
                     variant="outlined"
                     color="primary"
                     sx={{ mr: 1 }}
@@ -124,7 +151,7 @@ const PublishersList = () => {
                     Edit
                   </Button>
                   <Button
-                    onClick={() => handleDelete(publisher.publisherID)}
+                    onClick={() => {setDeletePopup(true);setPublisherId(publisher.publisherID)}}
                     variant="outlined"
                     color="error"
                     sx={{ mr: 1 }}

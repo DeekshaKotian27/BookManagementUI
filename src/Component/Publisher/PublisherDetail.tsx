@@ -5,34 +5,30 @@ import { Typography } from "@mui/material";
 import ModalHeader from "../ModalHeader";
 
 interface PublisherDetailProps {
-  publisherId: number | null;
-  setPublisherId: (id: number | null) => void;
+  publisherId: number;
+  setshowPublisherDetail: (show: boolean) => void;
 }
 
 const PublisherDetail: React.FC<PublisherDetailProps> = ({
   publisherId,
-  setPublisherId,
+  setshowPublisherDetail,
 }) => {
   const [publisherData, setPublisherData] = useState<Publisher>();
 
   useEffect(() => {
     const fetchData = async () => {
-      if (publisherId) {
         var data = await getPublisherByID(publisherId);
-        setPublisherData(data);
-      } else {
-        console.log("invalid publisher ID");
-      }
+        if(data!=null && data.success){
+          setPublisherData(data.data as Publisher)
+        }
     };
     fetchData();
   }, []);
-  const handleClose = () => {
-    setPublisherId(null);
-  };
+  
   console.log(publisherData);
   return (
     <div>
-      <ModalHeader handleClose={handleClose} heading="Details" />
+      <ModalHeader handleClose={()=>setshowPublisherDetail(false)} heading="Details" />
       <div className="add-form">
         <h1>{publisherData?.publisherName}</h1>
         {publisherData?.books.map((data) => (

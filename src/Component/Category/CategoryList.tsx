@@ -18,31 +18,41 @@ import "../../CSS/StylePages.css";
 import CategoryDetail from "./CategoryDetail";
 import AddButton from "../AddButton";
 import SearchTextField from "../SearchTextField";
+import YesNoDialougeBox from "../YesNoDialougeBox";
+import MessageDialougeBox from "../MessageDialougeBox";
 
 const CategoryList: React.FC = () => {
   const [category, setCategory] = useState<Category[]>([]);
   const [showAddCategory, setShowAddCategory] = useState<boolean>(false);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
-  const [categoryId, setCategoryID] = useState<number | null>(null);
+  const [categoryId, setCategoryID] = useState<number>(-1);
+  const [showCategoryDetail,setShowCategoryDetail]=useState<boolean>(false);
+  const [deletePopup, setDeletePopup] = useState<boolean>(false);
+  const [apiMessagePopUp,setApiMessagePopup]=useState<boolean>(false);
+  const [apiMessage,setApiMessage]=useState<String>("");
+  const [success, setSuccess] = useState<boolean>(false);
+
   const handleClosePopup = () => setShowAddCategory(false);
-  const handleDetailClosePopup = () => setCategoryID(null);
+  const handleDetailClosePopup = () => setShowCategoryDetail(false);
+  const handleDeletePopup=()=>setDeletePopup(false);
+  const handleAPIMessagePopup=()=>setApiMessagePopup(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const result = await getCategories();
-        setCategory(result);
-      } catch (error) {
-        console.error("Error fetching authors:", error);
-      }
+      const categoriesListResponse = await getCategories();
+        if(categoriesListResponse!==null && categoriesListResponse.success)
+        {setCategory(categoriesListResponse.data as Category[]);}
     };
 
     fetchData();
-  }, []);
+  }, [category]);
 
   const handleDelete = async (id: number) => {
-    await deleteCategory(id);
-    window.location.reload();
+    var deleteData=await deleteCategory(id);
+    setSuccess(deleteData.success);
+    setApiMessage(deleteData.message);
+    setDeletePopup(false);
+    setApiMessagePopup(true)
   };
 
   const handleEdit = (category: Category) => {
@@ -74,14 +84,29 @@ const CategoryList: React.FC = () => {
           />
         </div>
       </Modal>
-      <Modal open={categoryId ? true : false} onClose={handleDetailClosePopup}>
+      <Modal open={showCategoryDetail} onClose={handleDetailClosePopup}>
         <div className="popUp">
           <CategoryDetail
             categoryId={categoryId}
-            setCategoryID={setCategoryID}
+            setShowCategoryDetail={setShowCategoryDetail}
           />
         </div>
       </Modal>
+
+       {/* Confirm Delete pop up */}
+       <Modal open={deletePopup} onClose={handleDeletePopup}>
+        <div className="MessageBoxPopUp">
+          <YesNoDialougeBox Id={categoryId} handleDelete={handleDelete}
+           setDeletePopup={setDeletePopup}/>
+        </div>
+      </Modal>
+      {/*Api Message popUp */}
+      <Modal open={apiMessagePopUp} onClose={handleAPIMessagePopup}>
+        <div  className="MessageBoxPopUp">
+          <MessageDialougeBox apiMessage={apiMessage} setApiMessagePopup={setApiMessagePopup} success={success}/>
+        </div>
+      </Modal>
+
       <TableContainer
         component={Paper}
         sx={{ maxHeight: 440, textAlignLast: "center" }}
@@ -101,7 +126,7 @@ const CategoryList: React.FC = () => {
                 <TableCell>{categoryData.categoryName}</TableCell>
                 <TableCell>
                   <Button
-                    onClick={() => setCategoryID(categoryData.categoryID)}
+                    onClick={() => {setShowCategoryDetail(true);setCategoryID(categoryData.categoryID)}}
                     sx={{ mr: 1 }}
                     variant="outlined"
                     color="primary"
@@ -117,7 +142,7 @@ const CategoryList: React.FC = () => {
                     Edit
                   </Button>
                   <Button
-                    onClick={() => handleDelete(categoryData.categoryID)}
+                    onClick={() =>{ setDeletePopup(true);setCategoryID(categoryData.categoryID)}}
                     sx={{ mr: 1 }}
                     variant="outlined"
                     color="error"
