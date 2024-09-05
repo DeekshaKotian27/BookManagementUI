@@ -17,13 +17,13 @@ The UI components such as sidebars, navigation, and lists are designed to be res
 The application uses React hooks like useState and useEffect for managing local state and side effects. Routing is handled by React Router, and form data is managed with controlled components.
 
 - Validation and Error Handling: 
-Forms include basic validation and error handling, ensuring that users provide correct information before submitting data.
+Forms include basic validation and error handling, ensuring that users provide correct information before submitting data. Error Handling of the different types of API Errors through error messages.
 
 - Integration with Backend: 
 The frontend interacts with a backend API ( built using .NET:[Book Management API](https://github.com/DeekshaKotian27/BookManagementAPI)) to fetch and manipulate data related to books, authors, etc.
 
 - Authentication: 
-Uses API Key Authentication passing in the header to authenticate the API endpoints.
+Uses API Key Authentication and JWT Bearer Authentication passing in the header to authenticate the API endpoints.
 
 
 ## Getting Started with Create React App
