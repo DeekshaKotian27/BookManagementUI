@@ -7,5 +7,5 @@ import { User } from "./Users";
 export interface ValidationResponse{
     success:boolean,
     message:string,
-    data?:User|Publisher|Publisher[]|NewPublisher|Category|Category[]|NewCategory|Books|NewBook|Books[]|Author|Author[]|newAuthor,
+    data?:User|User[]|Publisher|Publisher[]|NewPublisher|Category|Category[]|NewCategory|Books|NewBook|Books[]|Author|Author[]|newAuthor,
 }

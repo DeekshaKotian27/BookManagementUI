@@ -45,7 +45,7 @@ const CategoryList: React.FC = () => {
     };
 
     fetchData();
-  }, [category]);
+  }, []);
 
   const handleDelete = async (id: number) => {
     var deleteData=await deleteCategory(id);

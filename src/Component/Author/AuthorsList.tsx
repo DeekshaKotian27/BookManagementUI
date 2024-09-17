@@ -46,7 +46,7 @@ const AuthorsList: React.FC = () => {
     };
 
     fetchData();
-  }, [authors]);
+  }, []);
 
   const handleDelete = async (id: number) => {
     var deleteData=await deleteAuthor(id);

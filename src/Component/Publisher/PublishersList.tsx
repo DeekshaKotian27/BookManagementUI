@@ -50,7 +50,7 @@ const PublishersList = () => {
     };
 
     fetchData();
-  }, [publishers]);
+  }, []);
 
   const handleDelete = async (id: number) => {
     var deleteData=await deletePublisher(id);
