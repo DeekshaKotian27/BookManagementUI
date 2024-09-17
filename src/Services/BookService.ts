@@ -10,7 +10,7 @@ const token = localStorage.getItem("JWTToken");
 console.log(token)
 export const getBooks = async (): Promise<ValidationResponse> => {
   try {
-    const response = await axios.get<Books[]>(`${API_URL}/Books`, {
+    const response = await axios.get<Books[]>(`${API_URL}/Books/GetAllBooks`, {
       headers: {
         [API_KEY!]: API_KEY_VALUE!,
         Authorization: `Bearer ${token}`,
@@ -29,7 +29,7 @@ export const getBooks = async (): Promise<ValidationResponse> => {
 
 export const addBooks = async (book: NewBook): Promise<ValidationResponse> => {
   try {
-    await axios.post<NewBook>(`${API_URL}/Books`, book, {
+    await axios.post<NewBook>(`${API_URL}/Books/CreateBook`, book, {
       headers: {
         [API_KEY!]: API_KEY_VALUE!,
         Authorization: `Bearer ${token}`,
@@ -50,7 +50,7 @@ export const updateBook = async (
   updatedBook: NewBook
 ): Promise<ValidationResponse> => {
   try {
-    await axios.put(`${API_URL}/Books/${bookId}`, updatedBook, {
+    await axios.put(`${API_URL}/Books/UpdateBook/${bookId}`, updatedBook, {
       headers: {
         [API_KEY!]: API_KEY_VALUE!,
         Authorization: `Bearer ${token}`,
@@ -65,7 +65,7 @@ export const updateBook = async (
 
 export const deleteBook = async (bookId: number): Promise<ValidationResponse> => {
   try {
-    await axios.delete(`${API_URL}/Books/${bookId}`, {
+    await axios.delete(`${API_URL}/Books/DeleteBook/${bookId}`, {
       headers: {
         [API_KEY!]: API_KEY_VALUE!,
         Authorization: `Bearer ${token}`,

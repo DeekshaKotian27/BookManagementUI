@@ -10,7 +10,7 @@ const token= localStorage.getItem("JWTToken");
 
 export const getPublishers= async():Promise<ValidationResponse>=>{
     try{
-        const response= await axios.get<Publisher[]>(`${API_URL}/Publisher`,{
+        const response= await axios.get<Publisher[]>(`${API_URL}/Publisher/GetAllPublisher`,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
@@ -30,7 +30,7 @@ export const getPublishers= async():Promise<ValidationResponse>=>{
 
 export const addPublisher=async(publisher:NewPublisher):Promise<ValidationResponse>=>{
     try{
-        await axios.post<NewPublisher>(`${API_URL}/Publisher`,publisher,{
+        await axios.post<NewPublisher>(`${API_URL}/Publisher/CreatePublisher`,publisher,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
@@ -49,7 +49,7 @@ export const addPublisher=async(publisher:NewPublisher):Promise<ValidationRespon
 
 export const getPublisherByID=async(id:number):Promise<ValidationResponse>=>{
     try{
-        const response=await axios.get<Publisher>(`${API_URL}/Publisher/${id}`,{
+        const response=await axios.get<Publisher>(`${API_URL}/Publisher/GetPublisherById/${id}`,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
@@ -69,7 +69,7 @@ export const getPublisherByID=async(id:number):Promise<ValidationResponse>=>{
 
 export const updatePublisher = async (id: number, updatedPublisher: NewPublisher): Promise<ValidationResponse> => {
     try {
-        await axios.put(`${API_URL}/Publisher/${id}`, updatedPublisher,{
+        await axios.put(`${API_URL}/Publisher/UpdatePublisher/${id}`, updatedPublisher,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
@@ -86,7 +86,7 @@ export const updatePublisher = async (id: number, updatedPublisher: NewPublisher
 
 export const deletePublisher = async (id: number): Promise<ValidationResponse> => {
     try {
-        await axios.delete(`${API_URL}/Publisher/${id}`,{
+        await axios.delete(`${API_URL}/Publisher/DeletePublisher/${id}`,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`

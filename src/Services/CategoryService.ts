@@ -10,7 +10,7 @@ const token= localStorage.getItem("JWTToken");
 
 export const getCategories= async():Promise<ValidationResponse>=>{
     try{
-        const response= await axios.get<Category[]>(`${API_URL}/Category`,{
+        const response= await axios.get<Category[]>(`${API_URL}/Category/GetAllCategory`,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
@@ -30,7 +30,7 @@ export const getCategories= async():Promise<ValidationResponse>=>{
 
 export const addCategory=async(category:NewCategory):Promise<ValidationResponse>=>{
     try{
-        await axios.post<NewCategory>(`${API_URL}/Category`,category,{
+        await axios.post<NewCategory>(`${API_URL}/Category/CreateCategory`,category,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
@@ -49,7 +49,7 @@ export const addCategory=async(category:NewCategory):Promise<ValidationResponse>
 
 export const getCategoryByID=async(id:number):Promise<ValidationResponse>=>{
     try{
-        const response=await axios.get<Category>(`${API_URL}/Category/${id}`,{
+        const response=await axios.get<Category>(`${API_URL}/Category/GetCategoryByID/${id}`,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
@@ -68,7 +68,7 @@ export const getCategoryByID=async(id:number):Promise<ValidationResponse>=>{
 
 export const updateCategory = async (id: number, updatedCategory: NewCategory): Promise<ValidationResponse> => {
     try {
-        await axios.put(`${API_URL}/Category/${id}`, updatedCategory,{
+        await axios.put(`${API_URL}/Category/UpdateCategory/${id}`, updatedCategory,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
@@ -85,7 +85,7 @@ export const updateCategory = async (id: number, updatedCategory: NewCategory): 
 
 export const deleteCategory = async (id: number): Promise<ValidationResponse> => {
     try {
-        await axios.delete(`${API_URL}/Category/${id}`,{
+        await axios.delete(`${API_URL}/Category/DeleteCategory/${id}`,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
