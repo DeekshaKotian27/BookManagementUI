@@ -10,7 +10,7 @@ const token= localStorage.getItem("JWTToken");
 
 export const getAuthors= async():Promise<ValidationResponse>=>{
     try{
-        const response= await axios.get<Author[]>(`${API_URL}/Author`,{
+        const response= await axios.get<Author[]>(`${API_URL}/Author/GetAllAuthor`,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
@@ -31,7 +31,7 @@ export const getAuthors= async():Promise<ValidationResponse>=>{
 
 export const addAuthors=async(author:newAuthor):Promise<ValidationResponse>=>{
     try{
-        await axios.post<newAuthor>(`${API_URL}/Author`,author,{
+        await axios.post<newAuthor>(`${API_URL}/Author/CreateAuthor`,author,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
@@ -50,7 +50,7 @@ export const addAuthors=async(author:newAuthor):Promise<ValidationResponse>=>{
 
 export const getAuthorByID=async(id:number):Promise<ValidationResponse>=>{
     try{
-        const response=await axios.get<Author>(`${API_URL}/Author/${id}`,{
+        const response=await axios.get<Author>(`${API_URL}/Author/GetAuthorByID/${id}`,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
@@ -69,7 +69,7 @@ export const getAuthorByID=async(id:number):Promise<ValidationResponse>=>{
 
 export const updateAuthor=async(id:number,author:newAuthor):Promise<ValidationResponse>=>{
     try{
-        await axios.put(`${API_URL}/Author/${id}`,author,{
+        await axios.put(`${API_URL}/Author/UpdateAuthor/${id}`,author,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`
@@ -87,7 +87,7 @@ export const updateAuthor=async(id:number,author:newAuthor):Promise<ValidationRe
 
 export const deleteAuthor=async(id:number):Promise<ValidationResponse>=>{
     try{
-        await axios.delete(`${API_URL}/Author/${id}`,{
+        await axios.delete(`${API_URL}/Author/DeleteAuthor/${id}`,{
             headers: {
                 [API_KEY!]: API_KEY_VALUE!,
                 'Authorization':`Bearer ${token}`

@@ -48,7 +48,7 @@ const BooksList: React.FC = () => {
     };
 
     fetchData();
-  }, [books]);
+  }, []);
 
   const handleDelete = async (id: number) => {
     var deleteData=await deleteBook(id);

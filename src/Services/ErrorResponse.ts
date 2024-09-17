@@ -6,6 +6,10 @@ export const handleAxiosError = (error: AxiosError): ValidationResponse => {
         switch (error.response.status) {
             case 400:
                 return { success: false, message: "Invalid Request, Please try again later" };
+            case 401:
+                return {success:false,message:"The MailID is not registered to the webiste.To register please Sign Up."}
+            case 403:
+                return {success:false,message:"Invalid Password"}
             case 404:
                 return { success: false, message: "The requested resource was not found." };
             case 409:

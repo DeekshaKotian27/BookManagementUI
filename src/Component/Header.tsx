@@ -20,7 +20,7 @@ const Header: React.FC<HeaderProps> = ({ displayNav, setDisplayNav }) => {
     setAnchorEl(event.currentTarget);
   };
   const handleLogout = () => {
-    setLoginData({ emailID: "", password: "", userName: "" });
+    setLoginData({ userId:-1,emailID: "", password: "", userName: "" ,role:""});
     localStorage.removeItem("loginData");
     localStorage.removeItem("JWTToken");
   };
@@ -69,7 +69,7 @@ const Header: React.FC<HeaderProps> = ({ displayNav, setDisplayNav }) => {
           onClose={() => setAnchorEl(null)}
           disableScrollLock
         >
-          <MenuItem onClick={() => navigate("/Myprofile")}>MyProfile</MenuItem>
+          <MenuItem onClick={() => navigate("/Myprofile")}>My Profile</MenuItem>
           <MenuItem onClick={handleLogout}>Logout</MenuItem>
         </Menu>
       </div>
